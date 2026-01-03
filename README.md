@@ -13,7 +13,7 @@ A bash-inspired shell built from scratch in Go with the help of CodeCrafters
   - [ ] pwd builtin
   - [ ] cd builtin
 - [ ] Quoting
-- [ ]
+- [ ] Redirection
 ---
 
 ## Quick start 
