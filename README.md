@@ -15,6 +15,7 @@ A bash-inspired shell built from scratch in Go with the help of CodeCrafters
 - [ ] Quoting
 - [ ] Redirection
 - [ ] Autocompletion
+- [ ] Pipelines
 ---
 
 ## Quick start 
