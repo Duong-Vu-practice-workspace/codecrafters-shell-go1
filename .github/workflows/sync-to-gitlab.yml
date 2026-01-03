@@ -1,21 +1,44 @@
-name: Sync Repository to GitLab
+name: 'Sync to GitLab'
+description: 'Automatically sync your GitHub repository with GitLab'
+branding:
+  icon: 'arrow-right'
+  color: 'orange'
+inputs:
+  gitlab_url:
+    description: 'The URL of the GitLab repository (e.g., https://gitlab.com/user/repo.git)'
+    required: true
+  username:
+    description: 'Your GitLab username'
+    required: true
+  gitlab_pat:
+    description: 'Your GitLab Personal Access Token with required permissions'
+    required: true
+  force_push:
+    description: 'Whether to force push to GitLab. Defaults to false.'
+    required: false
+    default: 'false'
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Push to GitLab
+      run: |
+        export GIT_SSH_COMMAND='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+        gitlab_repo_url=${{ inputs.gitlab_url }}
+        gitlab_repo_url=${gitlab_repo_url#https://}
+        gitlab_repo_url_with_credentials="https://${{ inputs.username }}:${{ inputs.gitlab_pat }}@${gitlab_repo_url}"
+        git remote add gitlab "$gitlab_repo_url_with_credentials"
 
-on:
-  push:
-    branches:
-      - test/duong
+        # Always push current HEAD to GitLab master
+        push_command="git push gitlab HEAD:master"
 
-jobs:
-  sync:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+        # Use force only if explicitly requested (consider --force-with-lease instead)
+        if [[ "${{ inputs.force_push }}" == "true" ]]; then
+          push_command="$push_command --force-with-lease"
+        fi
 
-      - name: Sync to GitLab
-        uses: kujov/gitlab-sync@2.1.0
-        with:
-          gitlab_url: ${{ secrets.GITLAB_URL }}
-          username: ${{ secrets.USERNAME }}
-          gitlab_pat: ${{ secrets.GITLAB_PAT }}
-          branch_name: master
+        $push_command
+      shell: bash
