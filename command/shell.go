@@ -13,6 +13,7 @@ func runCommand(cmd string, args []string) {
 	_, ok := searchPath(cmd)
 	if !ok {
 		fmt.Printf("%s: not found\n", cmd)
+		return
 	}
 	runCmd := exec.Command(cmd, args...)
 	runCmd.Stdin = os.Stdin
