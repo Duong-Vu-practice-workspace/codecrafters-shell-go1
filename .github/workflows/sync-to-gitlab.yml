@@ -1,44 +1,31 @@
-name: 'Sync to GitLab'
-description: 'Automatically sync your GitHub repository with GitLab'
-branding:
-  icon: 'arrow-right'
-  color: 'orange'
-inputs:
-  gitlab_url:
-    description: 'The URL of the GitLab repository (e.g., https://gitlab.com/user/repo.git)'
-    required: true
-  username:
-    description: 'Your GitLab username'
-    required: true
-  gitlab_pat:
-    description: 'Your GitLab Personal Access Token with required permissions'
-    required: true
-  force_push:
-    description: 'Whether to force push to GitLab. Defaults to false.'
-    required: false
-    default: 'false'
-runs:
-  using: 'composite'
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Push to GitLab
-      run: |
-        export GIT_SSH_COMMAND='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
-        gitlab_repo_url=${{ inputs.gitlab_url }}
-        gitlab_repo_url=${gitlab_repo_url#https://}
-        gitlab_repo_url_with_credentials="https://${{ inputs.username }}:${{ inputs.gitlab_pat }}@${gitlab_repo_url}"
-        git remote add gitlab "$gitlab_repo_url_with_credentials"
+name: Sync to GitLab
 
-        # Always push current HEAD to GitLab master
-        push_command="git push gitlab HEAD:master"
+on:
+  push:
+    branches:
+      - test/duong
 
-        # Use force only if explicitly requested (consider --force-with-lease instead)
-        if [[ "${{ inputs.force_push }}" == "true" ]]; then
-          push_command="$push_command --force-with-lease"
-        fi
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-        $push_command
-      shell: bash
+      - name: Push current HEAD to GitLab master
+        env:
+          GITLAB_REPO: ${{ secrets.GITLAB_REPO }}        # e.g. https://gitlab.com/owner/repo.git
+          GITLAB_USERNAME: ${{ secrets.USERNAME }}
+          GITLAB_PAT: ${{ secrets.GITLAB_PAT }}
+          FORCE_PUSH: ${{ secrets.FORCE_PUSH }}          # optional, 'true' or 'false'
+        run: |
+          repo="${GITLAB_REPO#https://}"
+          remote="https://${GITLAB_USERNAME}:${GITLAB_PAT}@${repo}"
+          git remote add gitlab "$remote"
+          if [ "${FORCE_PUSH}" = "true" ]; then
+            git push --force-with-lease gitlab "HEAD:master"
+          else
+            git push --force-with-lease gitlab "HEAD:master"
+          fi
