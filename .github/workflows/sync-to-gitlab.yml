@@ -3,7 +3,7 @@ name: Sync Repository to GitLab
 on:
   push:
     branches:
-      - master
+      - test/duong
 
 jobs:
   sync:
