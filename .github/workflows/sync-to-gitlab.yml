@@ -1,4 +1,4 @@
-name: Sync to GitLab
+name: Sync Repository to GitLab
 
 on:
   push:
@@ -11,16 +11,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Push current HEAD to GitLab master
-        env:
-          GITLAB_REPO: ${{ secrets.GITLAB_URL }}        # e.g. https://gitlab.com/owner/repo.git
-          GITLAB_USERNAME: ${{ secrets.USERNAME }}
-          GITLAB_PAT: ${{ secrets.GITLAB_PAT }}
-        run: |
-          repo="${GITLAB_REPO#https://}"
-          remote="https://${GITLAB_USERNAME}:${GITLAB_PAT}@${repo}"
-          git remote add gitlab "$remote"
-          git push --force-with-lease gitlab "HEAD:master"
+      - name: Sync to GitLab
+        uses: kujov/gitlab-sync@2.1.0
+        with:
+          gitlab_url: ${{ secrets.GITLAB_URL }}
+          username: ${{ secrets.USERNAME }}
+          gitlab_pat: ${{ secrets.GITLAB_PAT }}
