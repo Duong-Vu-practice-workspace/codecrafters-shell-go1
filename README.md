@@ -1,18 +1,5 @@
 # Shell implementation in Go
-A small, private, Codecrafters-assisted side project — a minimal interactive shell (REPL) implemented in Go that supports builtins (`exit`, `echo`, `type`) and running external commands found on `PATH`. This repository is not open source; it’s for learning and practice with Codecrafters.
-
----
-
-## Table of contents
-- **Why this project?** 💡
-- **Features** ✨
-- **Quick start** 🔧
-- **Usage examples** 🧪
-- **How it works** 🔍
-- **Development notes** 🛠️
-- **Status & License** ⚠️
-- **Author / Contact** 📫
-
+A bash-inspired shell built from scratch in Go with the help of CodeCrafters
 ---
 
 
