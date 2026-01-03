@@ -16,16 +16,11 @@ jobs:
 
       - name: Push current HEAD to GitLab master
         env:
-          GITLAB_REPO: ${{ secrets.GITLAB_REPO }}        # e.g. https://gitlab.com/owner/repo.git
+          GITLAB_REPO: ${{ secrets.GITLAB_URL }}        # e.g. https://gitlab.com/owner/repo.git
           GITLAB_USERNAME: ${{ secrets.USERNAME }}
           GITLAB_PAT: ${{ secrets.GITLAB_PAT }}
-          FORCE_PUSH: ${{ secrets.FORCE_PUSH }}          # optional, 'true' or 'false'
         run: |
           repo="${GITLAB_REPO#https://}"
           remote="https://${GITLAB_USERNAME}:${GITLAB_PAT}@${repo}"
           git remote add gitlab "$remote"
-          if [ "${FORCE_PUSH}" = "true" ]; then
-            git push --force-with-lease gitlab "HEAD:master"
-          else
-            git push --force-with-lease gitlab "HEAD:master"
-          fi
+          git push --force-with-lease gitlab "HEAD:master"
