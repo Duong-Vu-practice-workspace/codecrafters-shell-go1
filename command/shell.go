@@ -4,16 +4,13 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strings"
 )
 
 func DefaultShellCommand(cmd string, args []string) {
-	fmt.Printf("%s: command not found\n", cmd)
+	runCommand(cmd, args)
 }
 func runCommand(cmd string, args []string) {
-	str := strings.Join(args, " ")
-	lines := cmd + " " + str
-	path, ok := searchPath(lines)
+	path, ok := searchPath(cmd)
 	if !ok {
 		fmt.Printf("%s: not found\n", cmd)
 		return
