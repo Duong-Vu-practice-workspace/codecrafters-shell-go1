@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-func checkPath(cmd string) (string, bool) {
+func CheckPath(cmd string) (string, bool) {
 	dirs := filepath.SplitList(os.Getenv("PATH"))
 	for _, dir := range dirs {
 		fullPath := filepath.Join(dir, cmd)

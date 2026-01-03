@@ -7,6 +7,8 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	"github.com/codecrafters-io/shell-starter-go/command"
 )
 
 // Ensures gofmt doesn't remove the "fmt" import in stage 1 (feel free to remove this!)
@@ -22,7 +24,7 @@ func main() {
 
 	for {
 		fmt.Print("$ ")
-		command, err := reader.ReadString('\n')
+		line, err := reader.ReadString('\n')
 		if err != nil {
 			if errors.Is(err, io.EOF) {
 				fmt.Println()
@@ -31,14 +33,14 @@ func main() {
 			fmt.Fprintln(os.Stderr, "Error reading input:", err)
 			os.Exit(1)
 		}
-		fields := strings.Fields(command)
+		fields := strings.Fields(line)
 		if len(fields) == 0 {
 			continue
 		}
-		command = fields[0]
+		cmd := fields[0]
 		args := fields[1:]
 
-		switch command {
+		switch cmd {
 		case "exit":
 			os.Exit(0)
 		case "echo":
@@ -51,11 +53,13 @@ func main() {
 			cmdLookup := args[0]
 			if _, ok := builtins[cmdLookup]; ok {
 				fmt.Printf("%s is a shell builtin\n", cmdLookup)
+			} else if path, ok := command.CheckPath(cmdLookup); ok {
+				fmt.Printf("%s is %s\n", cmdLookup, path)
 			} else {
 				fmt.Printf("%s: not found\n", cmdLookup)
 			}
 		default:
-			fmt.Printf("%s: command not found\n", command)
+			fmt.Printf("%s: command not found\n", cmd)
 		}
 	}
 }
